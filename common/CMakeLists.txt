@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 3.16)
+project(common C CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(WITHOUT_NUMPY 1)
+
+set(PYTHON_SEARCH_PATH "C:\\Python27")
+include_directories(C:\\Python27\\include)
+include_directories(C:\\Python27\\Lib)
+set(Python_ADDITIONAL_VERSIONS 2.7)
+find_package(PythonLibs REQUIRED)
+
+add_library(common matplotlib.h common.cpp)
