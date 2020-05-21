@@ -16,4 +16,5 @@ add_definitions(-DMATPLOTLIBCPP_PYTHON_HEADER=Python.h)
 #find_package(PythonLibs REQUIRED)
 
 include_directories(..\\common)
-add_executable(chapter_3 main.cpp)
+add_executable(simple-plot simple-plot.cpp)
+add_executable(simple-bar simple-bar.cpp)
