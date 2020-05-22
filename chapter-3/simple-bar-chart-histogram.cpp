@@ -23,7 +23,7 @@ int main() {
         }
     }
 
-    std::vector<intgi> yAxis;
+    std::vector<int> yAxis;
     for (const auto & [key, value] : countByGradeLevel) {
         xAxis.push_back(key);
         yAxis.push_back(value);
