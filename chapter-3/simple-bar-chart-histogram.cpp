@@ -14,13 +14,7 @@ int main() {
     std::unordered_map<int, int> countByGradeLevel = {};
     for (int i = 0; i < grades.size(); i++) {
         int normalizedGradeLevel = (int) (std::floor(grades[i] / 10) * 10);
-        auto countSearchResult = countByGradeLevel.find(normalizedGradeLevel);
-        if (countSearchResult == countByGradeLevel.end()) {
-            countByGradeLevel[normalizedGradeLevel] = 1;
-        }
-        else {
-            countByGradeLevel[normalizedGradeLevel] = countSearchResult->second + 1;
-        }
+        countByGradeLevel[normalizedGradeLevel]++;
     }
 
     std::vector<int> yAxis;
