@@ -2,6 +2,7 @@
 #define COMMON_VECTORMATH_H
 
 #include <vector>
+#include <unordered_map>
 #include <cmath>
 
 namespace vectormath {
@@ -64,10 +65,10 @@ namespace vectormath {
     }
 
     template<typename Numeric>
-    std::vector<Numeric> vector_dot_product(std::vector<Numeric> v, std::vector<Numeric> w) {
-        Numeric result = 0;
+    float vector_dot_product(std::vector<Numeric> v, std::vector<Numeric> w) {
+        float result = 0;
 
-        if (v.size() !== w.size()) {
+        if (v.size() != w.size()) {
             throw "Vectors must be the same size!";
         }
 
@@ -79,7 +80,7 @@ namespace vectormath {
     }
 
     template<typename Numeric>
-    std::vector<Numeric> vector_sum_of_squares(std::vector<Numeric> v) {
+    Numeric vector_sum_of_squares(std::vector<Numeric> v) {
         return vector_dot_product(v, v);
     }
 
@@ -96,6 +97,15 @@ namespace vectormath {
     template<typename Numeric>
     std::vector<Numeric> vector_distance(std::vector<Numeric> v, std::vector<Numeric> w) {
         return vector_magnitude(vector_subtract(v, w));
+    }
+
+    template<typename Numeric>
+    std::unordered_map<Numeric, int> vector_count(std::vector<Numeric> v) {
+        std::unordered_map<Numeric, int> result;
+        for (Numeric item : v) {
+            result[item]++; // autovivication!
+        }
+        return result;
     }
 
 }
