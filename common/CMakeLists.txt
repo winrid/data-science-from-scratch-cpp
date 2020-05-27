@@ -10,4 +10,4 @@ include_directories(C:\\Python27\\Lib)
 set(Python_ADDITIONAL_VERSIONS 2.7)
 find_package(PythonLibs REQUIRED)
 
-add_library(common matplotlib.h vectormath.h matrixmath.h statistics.h common.cpp)
+add_library(common matplotlib.h vectormath.h matrixmath.h statistics.h probabilities.h common.cpp)

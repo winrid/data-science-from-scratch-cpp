@@ -1,7 +1,7 @@
 # TO BUILD THS YOU MUST SET THE TARGET TO amd64
 
 cmake_minimum_required(VERSION 3.16)
-project(chapter_5 C CXX)
+project(chapter_6 C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -11,9 +11,6 @@ include_directories(C:\\Python27\\Lib\\site-packages\\numpy\\core\\include)
 LINK_DIRECTORIES(C:\\Python27\\libs)
 add_definitions(-DMATPLOTLIBCPP_PYTHON_HEADER=Python.h)
 
-# does not seem like we need these w/ include_directories above?
-#set(Python_ADDITIONAL_VERSIONS 2.7)
-#find_package(PythonLibs REQUIRED)
-
 include_directories(..\\common)
-add_executable(stats-test stats-test.cpp)
+add_executable(normal_pdf normal_pdf.cpp)
+add_executable(normal_cdf normal_cdf.cpp)
