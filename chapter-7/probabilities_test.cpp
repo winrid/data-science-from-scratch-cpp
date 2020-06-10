@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ctime>
 #include "../common/probabilities.h"
 
 int main() {
@@ -39,4 +40,56 @@ int main() {
 
     std::cout << "\n";
     std::cout << "Power: " << power2; // TODO BUG should be 0.936. is 0.886
+
+    std::cout << "\n";
+    std::cout << " _value for 529.5: " << probabilities::two_sided_p_value(529.5, approximation.mu, approximation.sigma); // 0.06
+    std::cout << "\n";
+    std::cout << "two_sided_p_value for 531.5: " << probabilities::two_sided_p_value(531.5, approximation.mu, approximation.sigma); // TODO WRONG, SHOULD BE 0.0463
+    std::cout << "\n";
+    std::cout << "two_sided_p_value for 524.5: " << probabilities::two_sided_p_value(524.5, approximation.mu, approximation.sigma); // TODO WRONG, SHOULD BE0.061
+    std::cout << "\n";
+    std::cout << "two_sided_p_value for 526.5: " << probabilities::two_sided_p_value(526.5, approximation.mu, approximation.sigma); // TODO WRONG, SHOULD BE 0.047
+
+    int extreme_value_count = 0;
+    srand((unsigned) time(0));
+    for (int i = 0; i <= 100000; i++) {
+        int num_heads = 0;
+        for (int flip = 0; flip <= 1000; flip++) {
+            if (((float) std::rand()) / ((float) RAND_MAX) < 0.5) {
+                num_heads++;
+            }
+        }
+        if (num_heads >= 530 || num_heads <= 470) {
+            extreme_value_count++;
+        }
+    }
+
+    std::cout << "\n";
+    std::cout << "Extreme Value Ratio: " << (float) ((float) extreme_value_count / 100000.0f); // should be ~0.062
+
+    /*
+     * for example, if "tastes great" gets 200 clicks out of 1000 views and "less bias" gets 180 clicks out of 1000
+     * views, the statistic equals -1.14.
+     */
+    float a_b_test = probabilities::a_b_test_statistic(1000, 200, 1000, 180);
+    std::cout << "\n";
+    std::cout << "a_b_test_statistic: " << a_b_test; // should be -1.14
+
+    // The probability of seeing such a large difference if the means were actually equal would be 0.254.
+    std::cout << "\n";
+    std::cout << "two_sided_p_value: " << probabilities::two_sided_p_value(a_b_test); // should be ~0.254
+
+    /*
+     * and 0.254 is large enough that we can't conclude there's much of a difference. On the other hand, if "less bias".
+     * On the other hand, if "less bias" only got 150 clicks we'd have -2.94 and 0.003.
+     */
+    a_b_test = probabilities::a_b_test_statistic(1000, 200, 1000, 150);
+    std::cout << "\n";
+    std::cout << "a_b_test_statistic: " << a_b_test; // should be -2.94
+
+    // The probability of seeing such a large difference if the means were actually equal would be 0.003.
+    std::cout << "\n";
+    std::cout << "two_sided_p_value: " << probabilities::two_sided_p_value(a_b_test); // should be ~0.003. TODO why getting 0.045?
+
+    // which means there's only a 0.003 probability you'd see such a large difference if the ads were equally effective.
 }

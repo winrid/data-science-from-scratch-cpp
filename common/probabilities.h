@@ -15,7 +15,7 @@ namespace probabilities {
         return exp((float) x_minus_mu_squared / 2 / sigma_squared) / sqrt_two_pi_sigma;
     }
 
-    double normal_cdf(int x, int mu, float sigma) {
+    double normal_cdf(float x, int mu, float sigma) {
         return (1.0 + erf((x - mu) / sqrt(2) / sigma)) / 2.0;
     }
 
@@ -30,7 +30,7 @@ namespace probabilities {
         double mid_z;
         while (hi_z - low_z > tolerance) {
             mid_z = (low_z + hi_z) / 2;
-            double mid_p = normal_cdf((int) mid_z, 0, 1);
+            double mid_p = normal_cdf(mid_z, 0, 1);
             if (mid_p < p) {
                 low_z = mid_z;
             }
@@ -102,6 +102,45 @@ namespace probabilities {
         return result;
     }
 
+    double two_sided_p_value (float x, int mu = 0, float sigma = 1) {
+        if (x >= (float) mu) {
+            return 2.0 * normal_probability_above(x, mu, sigma);
+        }
+        else {
+            return 2.0 * normal_probability_below(x, mu, sigma);
+        }
+    }
+
+    struct estimated_parameters_result {
+        float p;
+        float sigma;
+    };
+
+    estimated_parameters_result estimated_parameters (int N, int n) {
+        estimated_parameters_result result{};
+        result.p = (float) n / (float) N;
+        result.sigma = std::sqrt(result.p * (1 - result.p) / (float) N);
+        return result;
+    }
+
+    float a_b_test_statistic(int N_A, int n_A, int N_B, int n_B) {
+        estimated_parameters_result n_a_est = estimated_parameters(N_A, n_A);
+        estimated_parameters_result n_b_est = estimated_parameters(N_B, n_B);
+        return (n_b_est.p - n_a_est.p) / std::sqrt(n_a_est.sigma * n_a_est.sigma + n_b_est.sigma * n_b_est.sigma);
+    }
+
+    // In the book this function is just called "B". I guess bayesian is a better name.
+    double bayesian(double alpha, double beta) {
+        return std::tgamma(alpha) * std::tgamma(beta) / std::tgamma(alpha + beta);
+    }
+
+    // EX: If alpha and beta are both 1, it's just the uniform distribution (centered at 0.5).
+    double beta_pdf(double x, double alpha, double beta) {
+        if (x <= 0 || x >= 1) { // no weight outside of 0->1
+            return 0;
+        }
+        return (std::pow(x, alpha - 1) * std::pow(1 - x, (beta - 1))) / bayesian(alpha, beta);
+    }
 }
 
 #endif //COMMON_PROPABILITIES_H

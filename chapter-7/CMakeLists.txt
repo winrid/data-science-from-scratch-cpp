@@ -13,3 +13,5 @@ add_definitions(-DMATPLOTLIBCPP_PYTHON_HEADER=Python.h)
 
 include_directories(..\\common)
 add_executable(probabilities_test probabilities_test.cpp)
+add_executable(bayesian_distribution_test bayesian_distribution_test.cpp)
+add_executable(bayesian_posterior_test bayesian_posterior_test.cpp)
