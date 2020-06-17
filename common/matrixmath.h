@@ -7,7 +7,7 @@ namespace matrixmath {
 
     class MatrixEntryFunction {
     public:
-        virtual Numeric operator() (int row, int col) = 0;
+        virtual double operator() (int row, int col) = 0;
     };
 
     template<typename Numeric>
