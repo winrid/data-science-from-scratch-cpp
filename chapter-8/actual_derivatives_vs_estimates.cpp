@@ -11,7 +11,7 @@ int main() {
     std::vector<double> actual;
     std::vector<double> estimate;
 
-    class SquareCallback: public gradient::DifferenceQuotientCallback {
+    class SquareCallback: public gradient::DoubleCallback {
         double operator() (double f) {
             return gradient::square(f);
         }

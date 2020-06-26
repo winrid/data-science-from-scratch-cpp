@@ -13,3 +13,4 @@ add_definitions(-DMATPLOTLIBCPP_PYTHON_HEADER=Python.h)
 
 include_directories(..\\common)
 add_executable(actual_derivatives_vs_estimates actual_derivatives_vs_estimates.cpp)
+add_executable(gradient_test gradient_test.cpp)

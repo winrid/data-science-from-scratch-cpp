@@ -24,7 +24,7 @@ namespace vectormath {
 
     template<typename Numeric>
     std::vector<Numeric> vector_subtract(std::vector<Numeric> v, std::vector<Numeric> w) {
-        if (v.size() !== w.size()) {
+        if (v.size() != w.size()) {
             throw "Vectors must be the same size!";
         }
 
@@ -85,17 +85,17 @@ namespace vectormath {
     }
 
     template<typename Numeric>
-    std::vector<Numeric> vector_magnitude(std::vector<Numeric> v) {
+    Numeric vector_magnitude(std::vector<Numeric> v) {
         return sqrt(vector_sum_of_squares(v));
     }
 
     template<typename Numeric>
-    std::vector<Numeric> vector_squared_distance(std::vector<Numeric> v, std::vector<Numeric> w) {
+    Numeric vector_squared_distance(std::vector<Numeric> v, std::vector<Numeric> w) {
         return vector_sum_of_squares(vector_subtract(v, w));
     }
 
     template<typename Numeric>
-    std::vector<Numeric> vector_distance(std::vector<Numeric> v, std::vector<Numeric> w) {
+    Numeric vector_distance(std::vector<Numeric> v, std::vector<Numeric> w) {
         return vector_magnitude(vector_subtract(v, w));
     }
 
