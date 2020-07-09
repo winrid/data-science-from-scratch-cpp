@@ -10,6 +10,16 @@ namespace gradient {
         virtual double operator()(double f) = 0;
     };
 
+    class DoubleVectorCallbackSingleResult {
+    public:
+        virtual double operator()(std::vector<double> f) = 0;
+    };
+
+    class DoubleVectorCallback {
+    public:
+        virtual std::vector<double> operator()(std::vector<double> f) = 0;
+    };
+
     double difference_quotient(DoubleCallback *differenceQuotientCallback, double x, double h) {
         return ((*differenceQuotientCallback)(x + h) - (*differenceQuotientCallback)(x)) / h;
     }
@@ -43,6 +53,39 @@ namespace gradient {
             result.push_back(2 * v_i);
         }
         return result;
+    }
+
+    // use gradient descent to find theta that minimizes target function
+    std::vector<double> minimize_batch(DoubleVectorCallbackSingleResult *target_fn, DoubleVectorCallback *gradient_fn, std::vector<double> theta, double tolerance=0.000001) {
+        std::vector<double> step_sizes {100, 10, 1, 0.1, 0.01, 0.001, 0.0001, 0.00001};
+
+        // the book wraps the callbacks in a method to check for exceptions and return Infinity, however not sure
+        // that is needed.
+
+        double value = (*target_fn)(theta);
+        while (true) {
+            std::vector<double> gradient = (*gradient_fn)(theta);
+            std::vector<double> next_theta_list;
+            double lowest = 0;
+            bool first = true;
+            for (double step_size : step_sizes) {
+                std::vector<double> next_thetas = step(theta, gradient, step_size * -1);
+                double candidate_target = (*target_fn)(next_thetas);
+                if (first || candidate_target < lowest) {
+                    first = false;
+                    next_theta_list = next_thetas;
+                }
+            }
+            double next_value = (*target_fn)(next_theta_list);
+
+            // stop if we're "converging"
+            if (std::abs(value - next_value) < tolerance) {
+                return theta;
+            } else {
+                theta = next_theta_list;
+                value = next_value;
+            }
+        }
     }
 
 }
