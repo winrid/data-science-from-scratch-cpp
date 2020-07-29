@@ -1,7 +1,11 @@
 #ifndef COMMON_GRADIENT_H
 #define COMMON_GRADIENT_H
 
+#include <algorithm>
+#include <chrono>
+#include <random>
 #include <vector>
+#include "vectormath.h"
 
 namespace gradient {
 
@@ -86,6 +90,78 @@ namespace gradient {
                 value = next_value;
             }
         }
+    }
+
+    class MinimizeStochasticTargetFn {
+    public:
+        virtual double operator()(double x_i, double y_i, std::vector<double> theta) = 0;
+    };
+
+    class MinimizeStochasticGradientFn {
+    public:
+        virtual std::vector<double> operator()(double x_i, double y_i, std::vector<double> theta) = 0;
+    };
+
+    struct minimize_stochastic_data {
+        double x;
+        double y;
+    };
+
+    // x and y should be the same size vector
+    // if you want to "maximize stochastic", just use this and in your callbacks do the negation.
+    std::vector<double> minimize_stochastic(MinimizeStochasticTargetFn *target_fn, MinimizeStochasticGradientFn *gradient_fn, std::vector<double> x, std::vector<double> y, std::vector<double> theta_0, double alpha_0=0.01) {
+        if (x.size() != y.size()) {
+            throw "x and y passed to minimize_stochastic should have the same size";
+        }
+
+        short iterations_with_no_improvement = 0;
+        double alpha = alpha_0;
+        std::vector<double> theta = theta_0;
+        std::vector<double> min_theta;
+        double min_value = std::numeric_limits<double>::infinity();
+
+        std::vector<minimize_stochastic_data> data;
+        for (int i = 0; i < x.size(); i++) {
+            minimize_stochastic_data datum{};
+            datum.x = x[i];
+            datum.y = y[i];
+            data.push_back(datum);
+        }
+
+
+	    // get a time-based seed
+	    unsigned seed = std::chrono::system_clock::now()
+           .time_since_epoch()
+           .count();
+
+        while (iterations_with_no_improvement < 100) {
+            double value = 0;
+            for (int i = 0; i < x.size(); i++) {
+                double x_i = x[i];
+                double y_i = y[i];
+                value += (*target_fn)(x_i, y_i, theta);
+            }
+
+            if (value < min_value) {
+                // if we've found a new minimum, remember it
+                // and go back to the original step size
+                min_theta = theta;
+                min_value = value;
+                iterations_with_no_improvement = 0;
+                alpha = alpha_0;
+            } else {
+                iterations_with_no_improvement++;
+                alpha *= 0.9;
+            }
+
+            std::shuffle(data.begin(), data.end(), std::default_random_engine(seed));
+            for (minimize_stochastic_data datum : data) {
+                std::vector<double> gradient_i = (*gradient_fn)(datum.x, datum.y, theta);
+                theta = vectormath::vector_subtract(theta, vectormath::vector_scalar_multiply(gradient_i, alpha));
+            }
+        }
+
+        return min_theta;
     }
 
 }
