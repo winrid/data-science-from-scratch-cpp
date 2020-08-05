@@ -20,7 +20,7 @@ namespace statistics {
 
     template<typename Numeric>
     float mean(std::vector<Numeric> v) {
-        return std::accumulate(v.begin(), v.end(), 0) / v.size();
+        return std::accumulate(v.begin(), v.end(), 0) / (float) v.size();
     }
 
     template<typename Numeric>
