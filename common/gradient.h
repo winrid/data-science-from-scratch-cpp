@@ -39,6 +39,7 @@ namespace gradient {
 //    double partial_difference_quotient(DoubleCallback *f, DoubleCallback *v, double i, double h) {
         // TODO the book doesn't really document what f and v should take or return, and it doesn't
         //  seem this function is used, so I'm not going to finish it until I see an example...
+        // TODO this is used in Chapter 10 Page 136 - finish it!
 //    }
 
     template<typename Numeric>
@@ -94,22 +95,22 @@ namespace gradient {
 
     class MinimizeStochasticTargetFn {
     public:
-        virtual double operator()(double x_i, double y_i, std::vector<double> theta) = 0;
+        virtual double operator()(std::vector<double> x_i, std::vector<double> y_i, std::vector<double> theta) = 0;
     };
 
     class MinimizeStochasticGradientFn {
     public:
-        virtual std::vector<double> operator()(double x_i, double y_i, std::vector<double> theta) = 0;
+        virtual std::vector<double> operator()(std::vector<double> x_i, std::vector<double> y_i, std::vector<double> theta) = 0;
     };
 
     struct minimize_stochastic_data {
-        double x;
-        double y;
+        std::vector<double> x;
+        std::vector<double> y;
     };
 
     // x and y should be the same size vector
     // if you want to "maximize stochastic", just use this and in your callbacks do the negation.
-    std::vector<double> minimize_stochastic(MinimizeStochasticTargetFn *target_fn, MinimizeStochasticGradientFn *gradient_fn, std::vector<double> x, std::vector<double> y, std::vector<double> theta_0, double alpha_0=0.01) {
+    std::vector<double> minimize_stochastic(MinimizeStochasticTargetFn *target_fn, MinimizeStochasticGradientFn *gradient_fn, std::vector<std::vector<double>> x, std::vector<std::vector<double>> y, std::vector<double> theta_0, double alpha_0=0.01) {
         if (x.size() != y.size()) {
             throw "x and y passed to minimize_stochastic should have the same size";
         }
@@ -128,7 +129,6 @@ namespace gradient {
             data.push_back(datum);
         }
 
-
 	    // get a time-based seed
 	    unsigned seed = std::chrono::system_clock::now()
            .time_since_epoch()
@@ -137,8 +137,8 @@ namespace gradient {
         while (iterations_with_no_improvement < 100) {
             double value = 0;
             for (int i = 0; i < x.size(); i++) {
-                double x_i = x[i];
-                double y_i = y[i];
+                std::vector<double> x_i = x[i];
+                std::vector<double> y_i = y[i];
                 value += (*target_fn)(x_i, y_i, theta);
             }
 
