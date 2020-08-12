@@ -49,10 +49,6 @@ namespace knn {
         std::string label;
     };
 
-    bool sort_point (point i, point j) {
-        return i.distance < j.distance;
-    }
-
     std::string classify(int k, std::vector<point> labeled_points, const point& new_point) {
         std::sort(labeled_points.begin(), labeled_points.end(), [new_point](const point i, const point j) -> int {
             return i.distance - new_point.distance; // todo does this work? if not, tag distance on point and then sort.
