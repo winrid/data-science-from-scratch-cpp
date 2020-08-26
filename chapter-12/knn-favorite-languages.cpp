@@ -59,7 +59,9 @@ int main() {
         std::vector<std::string> lastPoints{};
         while (std::getline(coordsFile, line)) {
             if (line == "NEXTSTATE") {
-                std::cout << "NEXT" << "\n";
+                plt::plot(xa, ya);
+                xa.clear();
+                ya.clear();
                 lastPoints.clear();
             }
             std::vector<std::string> tokens = split(line, ",");
