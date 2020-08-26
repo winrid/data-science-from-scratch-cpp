@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <string>
 #include "../common/knn.h"
 
 #define WITHOUT_NUMPY 1
@@ -13,6 +15,19 @@ struct city_favorite_language {
     double latitude;
     std::string language;
 };
+
+std::vector<std::string> split(const std::string &str, const std::string &delim) {
+    std::vector<std::string> tokens;
+    size_t prev = 0, pos = 0;
+    do {
+        pos = str.find(delim, prev);
+        if (pos == std::string::npos) pos = str.length();
+        std::string token = str.substr(prev, pos - prev);
+        if (!token.empty()) tokens.push_back(token);
+        prev = pos + delim.length();
+    } while (pos < str.length() && prev < str.length());
+    return tokens;
+}
 
 int main() {
 
@@ -32,6 +47,42 @@ int main() {
             {"Python", "b"},
             {"R",      "g"}
     };
+
+    // Draw state outlines.
+    std::fstream coordsFile;
+    coordsFile.open(R"(C:\Users\winri\Documents\GitHub\data-science-from-scratch-cpp\chapter-11\state-coords.txt)",
+                    std::ios::in);
+    if (coordsFile.is_open()) {
+        std::string line;
+        std::vector<double> xa{};
+        std::vector<double> ya{};
+        std::vector<std::string> lastPoints{};
+        while (std::getline(coordsFile, line)) {
+            if (line == "NEXTSTATE") {
+                std::cout << "NEXT" << "\n";
+                lastPoints.clear();
+            }
+            std::vector<std::string> tokens = split(line, ",");
+            if (!lastPoints.empty()) {
+                if (lastPoints.size() != tokens.size()) {
+                    std::cout << "Skipping: " << line << "\n";
+                } else {
+                    double lastLat = std::atof(lastPoints[0].c_str());
+                    double lastLon = std::atof(lastPoints[1].c_str());
+                    double nextLat = std::atof(tokens[0].c_str());
+                    double nextLon = std::atof(tokens[1].c_str());
+                    ya.push_back(lastLat);
+                    ya.push_back(nextLat);
+                    xa.push_back(lastLon);
+                    xa.push_back(nextLon);
+                }
+            }
+            lastPoints = tokens;
+        }
+        plt::plot(xa, ya);
+    } else {
+        std::cout << "Could not open state coords file!";
+    }
 
     plt::title("Favorite Programming Languages");
     plt::xlim(-130, -60);
