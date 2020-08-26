@@ -1,5 +1,4 @@
 #include <iostream>
-
 #include "../common/machinelearning.h"
 
 int main() {
