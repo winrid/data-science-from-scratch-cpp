@@ -59,7 +59,7 @@ int main() {
         std::vector<std::string> lastPoints{};
         while (std::getline(coordsFile, line)) {
             if (line == "NEXTSTATE") {
-                plt::plot(xa, ya);
+                plt::plot(xa, ya, "b");
                 xa.clear();
                 ya.clear();
                 lastPoints.clear();
@@ -81,7 +81,7 @@ int main() {
             }
             lastPoints = tokens;
         }
-        plt::plot(xa, ya);
+        plt::plot(xa, ya, "b");
     } else {
         std::cout << "Could not open state coords file!";
     }
