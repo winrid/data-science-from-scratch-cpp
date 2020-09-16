@@ -16,6 +16,12 @@ struct city_favorite_language {
     std::string language;
 };
 
+struct language_config {
+    std::string language;
+    std::string color;
+    std::string marker;
+};
+
 std::vector<std::string> split(const std::string &str, const std::string &delim) {
     std::vector<std::string> tokens;
     size_t prev = 0, pos = 0;
@@ -30,23 +36,6 @@ std::vector<std::string> split(const std::string &str, const std::string &delim)
 }
 
 int main() {
-
-    std::vector<city_favorite_language> cities = {};
-    cities.push_back({"Seattle", -122.3, 47.53, "Python"});
-    cities.push_back({"Austin", -96.85, 32.85, "Java"});
-    cities.push_back({"Madison", -89.33, 43.13, "R"});
-
-    std::unordered_map<std::string, std::string> markers = {
-            {"Java",   "o"},
-            {"Python", "s"},
-            {"R",      "^"}
-    };
-
-    std::unordered_map<std::string, std::string> colors = {
-            {"Java",   "r"},
-            {"Python", "b"},
-            {"R",      "g"}
-    };
 
     // Draw state outlines.
     std::fstream coordsFile;
@@ -84,6 +73,29 @@ int main() {
         plt::plot(xa, ya, "b");
     } else {
         std::cout << "Could not open state coords file!";
+    }
+
+    std::vector<city_favorite_language> cities = {};
+    cities.push_back({"Seattle", -122.3, 47.53, "Python"});
+    cities.push_back({"Austin", -96.85, 32.85, "Java"});
+    cities.push_back({"Madison", -89.33, 43.13, "R"});
+
+    std::vector<language_config> languages{
+            {"Python", "b", "s"},
+            {"Java",   "r", "o"},
+            {"R",      "g", "^"},
+    };
+
+    for (const language_config &languageConfig : languages) {
+        std::vector<double> x{};
+        std::vector<double> y{};
+        for (const city_favorite_language &cityFavoriteLanguage : cities) {
+            if (languageConfig.language == cityFavoriteLanguage.language) {
+                x.push_back(cityFavoriteLanguage.longitude);
+                y.push_back(cityFavoriteLanguage.latitude);
+            }
+        }
+        plt::named_plot(languageConfig.language, x, y, languageConfig.color + languageConfig.marker);
     }
 
     plt::title("Favorite Programming Languages");
