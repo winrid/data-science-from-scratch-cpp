@@ -9,13 +9,6 @@
 
 namespace plt = matplotlibcpp;
 
-struct city_favorite_language {
-    std::string city;
-    double longitude;
-    double latitude;
-    std::string language;
-};
-
 struct language_config {
     std::string language;
     std::string color;
@@ -34,6 +27,9 @@ std::vector<std::string> split(const std::string &str, const std::string &delim)
     } while (pos < str.length() && prev < str.length());
     return tokens;
 }
+
+bool RENDER_TEST = false;
+int NEIGHBORS = 1;
 
 int main() {
 
@@ -75,10 +71,13 @@ int main() {
         std::cout << "Could not open state coords file!";
     }
 
-    std::vector<city_favorite_language> cities = {};
-    cities.push_back({"Seattle", -122.3, 47.53, "Python"});
-    cities.push_back({"Austin", -96.85, 32.85, "Java"});
-    cities.push_back({"Madison", -89.33, 43.13, "R"});
+    std::cout << "Setup chart outlines...\n";
+
+    std::vector<knn::point> markers = {};
+    std::vector<knn::point> cities = {};
+    cities.push_back({-122.3, 47.53, "Python"}); // "Seattle"
+    cities.push_back({-96.85, 32.85, "Java"}); // "Austin"
+    cities.push_back({-89.33, 43.13, "R"}); // "Madison"
 
     std::vector<language_config> languages{
             {"Python", "b", "s"},
@@ -86,17 +85,43 @@ int main() {
             {"R",      "g", "^"},
     };
 
+    if (RENDER_TEST) {
+        for (const knn::point& city : cities) {
+            markers.push_back({city.longitude, city.latitude, city.label});
+        }
+    } else {
+        std::cout << "Doing prediction...\n";
+        for (int longitude = -130; longitude <= -60; longitude++) {
+            for (int latitude = 20; latitude <= 55; latitude++) {
+                std::string predicted_language = knn::classify(NEIGHBORS, cities, {
+                        (double) longitude, (double) latitude, ""
+                });
+//                std::cout << "Predicted " << predicted_language << " at " << longitude << " " << latitude << "\n";
+                markers.push_back({(double) longitude, (double) latitude, predicted_language});
+            }
+        }
+        std::cout << "Prediction done...\n";
+    }
+
     for (const language_config &languageConfig : languages) {
         std::vector<double> x{};
         std::vector<double> y{};
-        for (const city_favorite_language &cityFavoriteLanguage : cities) {
-            if (languageConfig.language == cityFavoriteLanguage.language) {
+        for (const knn::point &cityFavoriteLanguage : cities) {
+            if (languageConfig.language == cityFavoriteLanguage.label) {
                 x.push_back(cityFavoriteLanguage.longitude);
                 y.push_back(cityFavoriteLanguage.latitude);
             }
         }
+        for (const knn::point &marker : markers) {
+            if (languageConfig.language == marker.label) {
+                x.push_back(marker.longitude);
+                y.push_back(marker.latitude);
+            }
+        }
         plt::named_plot(languageConfig.language, x, y, languageConfig.color + languageConfig.marker);
+
     }
+    std::cout << "Done with plots...";
 
     plt::title("Favorite Programming Languages");
     plt::xlim(-130, -60);

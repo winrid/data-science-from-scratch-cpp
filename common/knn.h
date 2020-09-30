@@ -4,13 +4,9 @@
 #include <algorithm>
 #include <unordered_map>
 #include <utility>
+#include <cmath>
 
 namespace knn {
-
-    struct knn_datapoint {
-        std::string label;
-        int value;
-    };
 
     // Assumes that labels are ordered from nearest to farthest.
     std::string majority_vote(std::vector<std::string> labels) {
@@ -19,7 +15,7 @@ namespace knn {
 
         std::unordered_map<std::string, int> vote_counts;
 
-        for (const std::string &label : labels) {
+        for (std::string label : labels) {
             vote_counts[label]++;
             if (vote_counts[label] >= winner_count) {
                 winner = label;
@@ -29,7 +25,7 @@ namespace knn {
 
         int num_winners = 0;
 
-        for (const std::string &label : labels) {
+        for (std::string label : labels) {
             if (vote_counts[label] == winner_count) {
                 num_winners++;
             }
@@ -38,23 +34,39 @@ namespace knn {
         if (num_winners == 1) {
             return winner;
         } else {
-            std::vector data_points_copied = std::move(labels);
-            data_points_copied.pop_back();
-            return majority_vote(data_points_copied);
+            std::vector<std::string> labels_without_last = std::move(labels);
+            labels_without_last.pop_back();
+            return majority_vote(labels_without_last);
         }
     }
 
     struct point {
-        int distance;
+        double longitude;
+        double latitude;
         std::string label;
     };
 
-    std::string classify(int k, std::vector<point> labeled_points, const point& new_point) {
+    double toRad(double degree) {
+        return degree / 180 * 3.14;
+    }
+
+    double calculateDistance(double lat1, double long1, double lat2, double long2) {
+        double dist;
+        dist = sin(toRad(lat1)) * sin(toRad(lat2)) + cos(toRad(lat1)) * cos(toRad(lat2)) * cos(toRad(long1 - long2));
+        dist = acos(dist);
+        dist = 6371 * dist;
+        return dist;
+    }
+
+    std::string classify(int k, std::vector<point> labeled_points, const point &new_point) {
         std::sort(labeled_points.begin(), labeled_points.end(), [new_point](const point i, const point j) -> int {
-            return i.distance - new_point.distance; // todo does this work? if not, tag distance on point and then sort.
+            return calculateDistance(i.latitude, i.longitude, new_point.latitude, new_point.longitude) <
+                calculateDistance(j.latitude, j.longitude, new_point.latitude, new_point.longitude);
         });
-        std::vector<std::string> k_nearest_labels(4);
-        for (int i = 0; i < 4; i++) {
+
+        int label_count = std::min(k, (int) labeled_points.size());
+        std::vector<std::string> k_nearest_labels(0);
+        for (int i = 0; i < label_count; i++) {
             k_nearest_labels.push_back(labeled_points[i].label);
         }
 
