@@ -9,6 +9,11 @@
 
 namespace naive_bays {
 
+    struct training_item {
+        std::string value;
+        bool is_bad;
+    };
+
     std::set<std::string> tokenize(std::string input) {
         std::transform(input.begin(), input.end(), input.begin(), ::tolower);
         std::set<std::string> result;
