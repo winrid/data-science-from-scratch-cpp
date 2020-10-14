@@ -13,3 +13,4 @@ add_definitions(-DMATPLOTLIBCPP_PYTHON_HEADER=Python.h)
 
 include_directories(..\\common)
 add_executable(tokenize tokenize.cpp)
+add_executable(count_words count_words.cpp)
