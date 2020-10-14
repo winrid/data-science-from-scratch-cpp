@@ -73,6 +73,35 @@ namespace naive_bays {
         return result;
     }
 
+    // I was hoping to make this namespace generic so we could add different classifications, but this method
+    // throws that out of the window.
+    double spam_probability(std::vector<training_probability> word_probabilities, std::string message) {
+        std::set<std::string> message_words = tokenize(message);
+        double log_prob_if_spam = 0;
+        double log_prob_if_not_spam = 0;
+
+        for (training_probability probability : word_probabilities) {
+            double prob_if_spam = std::log(probability.probability_by_classification[classification::BAD]);
+            double prob_if_not_spam = std::log(probability.probability_by_classification[classification::GOOD]);
+
+            // if word appears in the message,
+            // add the log probability of seeing it
+            if (message_words.count(probability.value) > 0) {
+                log_prob_if_spam += std::log(prob_if_spam);
+                log_prob_if_not_spam += std::log(prob_if_not_spam);
+            } else {
+                // if the word doesn't appear in the message, add the log probability of not seeing it
+                // which is log(1 - probability of seeing it)
+                log_prob_if_spam += std::log(1.0 - prob_if_spam);
+                log_prob_if_not_spam += std::log(1.0 - prob_if_not_spam);
+            }
+        }
+
+        double prob_if_spam = std::exp(log_prob_if_spam);
+        double prob_if_not_spam = std::exp(log_prob_if_not_spam);
+        return prob_if_spam / (prob_if_spam + prob_if_not_spam);
+    }
+
 }
 
 #endif //COMMON_NAIVE_BAYES_H
