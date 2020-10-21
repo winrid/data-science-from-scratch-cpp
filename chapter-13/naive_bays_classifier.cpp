@@ -15,7 +15,8 @@ add_file_to_training_set(const std::string &path, bool is_spam, std::vector<naiv
         while (std::getline(file, line)) {
             if (line.find(SUBJECT_PREFIX) == 0) { // we only care about email subjects
 //                std::cout << "adding to set " << line << "\n";
-                training_set.push_back({line.substr(SUBJECT_PREFIX.size() - 1), is_spam ? naive_bays::classification::BAD : naive_bays::classification::GOOD});
+                training_set.push_back({line.substr(SUBJECT_PREFIX.size() - 1),
+                                        is_spam ? naive_bays::classification::BAD : naive_bays::classification::GOOD});
             }
         }
     }
@@ -33,6 +34,10 @@ struct classification_result {
     double spam_probability;
 };
 
+bool compareClassifications(const classification_result &a, const classification_result &b) {
+    return a.spam_probability > b.spam_probability;
+}
+
 int main() {
     std::vector<naive_bays::training_item> data;
     add_dir_to_training_set(R"(C:\Users\winri\Downloads\spam)", true, data);
@@ -45,7 +50,7 @@ int main() {
     std::vector<naive_bays::training_item> training_data;
     std::vector<naive_bays::training_item> testing_data;
 
-    for (const naive_bays::training_item& item : data) {
+    for (const naive_bays::training_item &item : data) {
         if (distr(gen) > 0.75) {
             training_data.push_back(item);
         } else {
@@ -57,7 +62,7 @@ int main() {
     classifier.train(training_data);
 
     std::vector<classification_result> classified;
-    for (const naive_bays::training_item& item : testing_data) {
+    for (const naive_bays::training_item &item : testing_data) {
         double result = classifier.classify(item.value);
         std::cout << "Classification result: " << result << "\n";
         classified.push_back({item.value, item.classification == naive_bays::classification::BAD, result});
@@ -67,7 +72,7 @@ int main() {
     int predicted_spam_count = 0;
     int actual_not_spam_count = 0;
     int predicted_not_spam_count = 0;
-    for (const classification_result& result : classified) {
+    for (const classification_result &result : classified) {
         if (result.is_spam) {
             actual_spam_count++;
         } else {
@@ -79,6 +84,33 @@ int main() {
             predicted_not_spam_count++;
         }
     }
+
     std::cout << "Spam vs Predicted Spam " << actual_spam_count << " " << predicted_spam_count << "\n";
     std::cout << "Not Spam vs Predicted Spam " << actual_not_spam_count << " " << predicted_not_spam_count << "\n";
+
+    std::sort(classified.begin(), classified.end(), compareClassifications);
+
+    int spam_ham_count = 0;
+    for (int i = 0; i < classified.size(); i++) {
+        classification_result result = classified[i];
+        if (!result.is_spam && result.spam_probability > 0.5) {
+            std::cout << "Spammy Ham: " << result.spam_probability << " " << result.subject << "\n";
+            spam_ham_count++;
+        }
+        if (spam_ham_count > 4) {
+            break;
+        }
+    }
+
+    int hammy_spam_count = 0;
+    for (int i = classified.size() - 1; i >= 0; i--) {
+        classification_result result = classified[i];
+        if (result.is_spam && result.spam_probability < 0.5) {
+            std::cout << "Hammy Spam: " << result.spam_probability << " " << result.subject << "\n";
+            hammy_spam_count++;
+        }
+        if (hammy_spam_count > 4) {
+            break;
+        }
+    }
 }
