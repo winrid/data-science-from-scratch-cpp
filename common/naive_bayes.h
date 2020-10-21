@@ -81,19 +81,19 @@ namespace naive_bays {
         double log_prob_if_not_spam = 0;
 
         for (training_probability probability : word_probabilities) {
-            double prob_if_spam = std::log(probability.probability_by_classification[classification::BAD]);
-            double prob_if_not_spam = std::log(probability.probability_by_classification[classification::GOOD]);
+            double prob_if_spam = probability.probability_by_classification[classification::BAD];
+            double prob_if_not_spam = probability.probability_by_classification[classification::GOOD];
 
             // if word appears in the message,
             // add the log probability of seeing it
             if (message_words.count(probability.value) > 0) {
-                log_prob_if_spam += std::log(prob_if_spam);
-                log_prob_if_not_spam += std::log(prob_if_not_spam);
+                log_prob_if_spam += prob_if_spam > 0 ? std::log(prob_if_spam) : 0;
+                log_prob_if_not_spam += prob_if_not_spam > 0 ? std::log(prob_if_not_spam) : 0;
             } else {
                 // if the word doesn't appear in the message, add the log probability of not seeing it
                 // which is log(1 - probability of seeing it)
-                log_prob_if_spam += std::log(1.0 - prob_if_spam);
-                log_prob_if_not_spam += std::log(1.0 - prob_if_not_spam);
+                log_prob_if_spam += (1.0 - prob_if_spam == 0 ? 0 : std::log(1.0 - prob_if_spam));
+                log_prob_if_not_spam += (1.0 - prob_if_not_spam == 0 ? 0 : std::log(1.0 - prob_if_not_spam));
             }
         }
 
