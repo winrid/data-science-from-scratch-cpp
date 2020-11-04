@@ -15,11 +15,11 @@ namespace probabilities {
         return exp((float) x_minus_mu_squared / 2 / sigma_squared) / sqrt_two_pi_sigma;
     }
 
-    double normal_cdf(float x, int mu, float sigma) {
+    double normal_cdf(double x, int mu = 0, double sigma = 1) {
         return (1.0 + erf((x - mu) / sqrt(2) / sigma)) / 2.0;
     }
 
-    double inverse_normal_cdf(float p, int mu = 0, float sigma = 1, double tolerance=0.00001) {
+    double inverse_normal_cdf(double p, int mu = 0, double sigma = 1, double tolerance=0.00001) {
         // if not standard, compute standard and rescale
         if (mu != 0 || sigma != 1) {
             return mu + sigma * inverse_normal_cdf(p, 0, 1, tolerance);

@@ -65,14 +65,14 @@ namespace dimensionality_reduction {
     }
 
     class DirectionalVarianceINegated : public gradient::MinimizeStochasticTargetFn {
-        double operator()(std::vector<double> x_i, std::vector<double> y_i, std::vector<double> theta) {
+        double operator()(std::vector<double> x_i, std::vector<double> y_i, std::vector<double> theta) override {
             return -directional_variance_i(x_i, theta);
         }
     };
 
     class DirectionalVarianceGradientINegated : public gradient::MinimizeStochasticGradientFn {
         std::vector<double>
-        operator()(std::vector<double> x_i, std::vector<double> y_i, std::vector<double> theta) {
+        operator()(std::vector<double> x_i, std::vector<double> y_i, std::vector<double> theta) override {
             std::vector<double> result = directional_variance_gradient_i(x_i, theta);
             for (int i = 0; i < result.size(); i++) {
                 result[i] = -result[i];

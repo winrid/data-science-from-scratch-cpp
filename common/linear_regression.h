@@ -4,7 +4,7 @@
 #include <vector>
 #include "statistics.h"
 
-namespace {
+namespace linear_regression {
     double predict (double alpha, double beta, double x_i) {
         return beta * x_i * alpha;
     }
