@@ -66,9 +66,16 @@ namespace multiple_regression {
         return gradient::minimize_stochastic(&squaredError, &squaredErrorGradient, x, std::move(y), beta_initial, 0.001);
     }
 
-    double multiple_r_squared(std::vector<double> x, std::vector<double> y, std::vector<double> beta) {
+    double multiple_r_squared(std::vector<std::vector<double>> x, std::vector<double> y, std::vector<double> beta) {
         // TODO seems like y is a list, but that doesn't make sense when it's supposed to call error() on page 183...
-        return 0;
+        double sum_of_squared_errors = 0;
+
+        for (int i = 0; i < std::min(x.size(), y.size()); i++) {
+            double error_result = error(x[i], y[i], beta);
+            sum_of_squared_errors += error_result * error_result;
+        }
+
+        return 1.0 - sum_of_squared_errors / vectormath::vector_sum_of_squares(y);
     }
 
     // randomly samples len(data) elements with replacement
@@ -128,9 +135,72 @@ namespace multiple_regression {
         return lambda * vectormath::vector_dot_product(beta_without_first, beta_without_first);
     }
 
-    double squared_error_ridge(std::vector<double> x_i, double y_i, std::vector<double> beta, double lambda) {
-        double error_rate = error(x_i, y_i, beta);
+    double squared_error_ridge(std::vector<double> x_i, double y_i, const std::vector<double>& beta, double lambda) {
+        double error_rate = error(std::move(x_i), y_i, beta);
         return (error_rate * error_rate) + ridge_penalty(beta, lambda);
+    }
+
+    // gradient of just the ridge penalty
+    std::vector<double> ridge_penalty_gradient(std::vector<double> beta, double lambda) {
+        std::vector<double> result;
+
+        result.push_back(0);
+
+        for (int i = 1; i < beta.size(); i++) {
+            result.push_back(2.0 * lambda * beta[i]);
+        }
+
+        return result;
+    }
+
+    // the gradient corresponding to the ith squared error term including the ridge penalty
+    std::vector<double> squared_error_ridge_gradient(std::vector<double> x_i, double y_i, const std::vector<double>& beta, double lambda) {
+        return vectormath::vector_add(squared_error_gradient(std::move(x_i), y_i, beta), ridge_penalty_gradient(beta, lambda));
+    }
+
+    class SquaredErrorRidge : public gradient::MinimizeStochasticTargetFn {
+        double lambda;
+        double operator()(std::vector<double> x_i, std::vector<double> y_i, std::vector<double> theta) override {
+            return squared_error_ridge(x_i, y_i[0], theta, lambda);
+        }
+    public:
+        explicit SquaredErrorRidge(double);
+    };
+
+    SquaredErrorRidge::SquaredErrorRidge (double newLambda) {
+        lambda = newLambda;
+    }
+
+    class SquaredErrorRidgeGradient : public gradient::MinimizeStochasticGradientFn {
+        double lambda;
+        std::vector<double>
+        operator()(std::vector<double> x_i, std::vector<double> y_i, std::vector<double> theta) override {
+            return squared_error_ridge_gradient(x_i, y_i[0], theta, lambda);
+        }
+    public:
+        explicit SquaredErrorRidgeGradient(double);
+    };
+
+    SquaredErrorRidgeGradient::SquaredErrorRidgeGradient(double newLambda) {
+        lambda = newLambda;
+    }
+
+    // use gradient descent to fit a ridge regression with penalty lambda
+    std::vector<double> estimate_beta_ridge(const std::vector<std::vector<double>>& x, std::vector<double> y, double lambda) {
+        std::vector<double> beta_initial;
+        std::random_device rd; // obtain a random number from hardware
+        std::mt19937 gen(rd()); // seed the generator
+        std::uniform_real_distribution<> distr(0, 1); // define the range
+
+        beta_initial.reserve(x.size());
+        for (int i = 0; i < x.size(); i++) {
+            beta_initial.push_back(distr(gen));
+        }
+
+        SquaredErrorRidge squaredErrorRidge(lambda);
+        SquaredErrorRidgeGradient squaredErrorRidgeGradient(lambda);
+
+        return gradient::minimize_stochastic(&squaredErrorRidge, &squaredErrorRidgeGradient, x, std::vector<std::vector<double>>{std::move(y)}, beta_initial, 0.001);
     }
 
 }

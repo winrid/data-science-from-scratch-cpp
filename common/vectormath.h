@@ -9,13 +9,9 @@ namespace vectormath {
 
     template<typename Numeric>
     std::vector<Numeric> vector_add(std::vector<Numeric> v, std::vector<Numeric> w) {
-        if (v.size() !== w.size()) {
-            throw "Vectors must be the same size!";
-        }
-
         std::vector<Numeric> result{};
 
-        for (int i = 0; i < v.size(); i++) {
+        for (int i = 0; i < std::min(v.size(), w.size()); i++) {
             result.push_back(v[i] + w[i]);
         }
 
@@ -24,13 +20,9 @@ namespace vectormath {
 
     template<typename Numeric>
     std::vector<Numeric> vector_subtract(std::vector<Numeric> v, std::vector<Numeric> w) {
-        if (v.size() != w.size()) {
-            throw "Vectors must be the same size!";
-        }
-
         std::vector<Numeric> result{};
 
-        for (int i = 0; i < v.size(); i++) {
+        for (int i = 0; i < std::min(v.size(), w.size()); i++) {
             result.push_back(v[i] - w[i]);
         }
 
@@ -68,11 +60,7 @@ namespace vectormath {
     float vector_dot_product(std::vector<Numeric> v, std::vector<Numeric> w) {
         float result = 0;
 
-        if (v.size() != w.size()) {
-            throw "Vectors must be the same size!";
-        }
-
-        for (int i = 0; i < v.size(); i++) {
+        for (int i = 0; i < std::min(v.size(), w.size()); i++) {
             result += v[i] * w[i];
         }
 

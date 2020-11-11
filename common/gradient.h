@@ -111,10 +111,6 @@ namespace gradient {
     // x and y should be the same size vector
     // if you want to "maximize stochastic", just use this and in your callbacks do the negation.
     std::vector<double> minimize_stochastic(MinimizeStochasticTargetFn *target_fn, MinimizeStochasticGradientFn *gradient_fn, std::vector<std::vector<double>> x, std::vector<std::vector<double>> y, std::vector<double> theta_0, double alpha_0=0.01) {
-        if (x.size() != y.size()) {
-            throw "x and y passed to minimize_stochastic should have the same size";
-        }
-
         short iterations_with_no_improvement = 0;
         double alpha = alpha_0;
         std::vector<double> theta = theta_0;
@@ -122,7 +118,7 @@ namespace gradient {
         double min_value = std::numeric_limits<double>::infinity();
 
         std::vector<minimize_stochastic_data> data;
-        for (int i = 0; i < x.size(); i++) {
+        for (int i = 0; i < std::min(x.size(), y.size()); i++) {
             minimize_stochastic_data datum{};
             datum.x = x[i];
             datum.y = y[i];
@@ -133,10 +129,10 @@ namespace gradient {
 	    unsigned seed = std::chrono::system_clock::now()
            .time_since_epoch()
            .count();
-
+//
         while (iterations_with_no_improvement < 100) {
             double value = 0;
-            for (int i = 0; i < x.size(); i++) {
+            for (int i = 0; i < std::min(x.size(), y.size()); i++) {
                 std::vector<double> x_i = x[i];
                 std::vector<double> y_i = y[i];
                 value += (*target_fn)(x_i, y_i, theta);
