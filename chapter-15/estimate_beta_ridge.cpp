@@ -3,7 +3,6 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <random>
 
 int main() {
     // Data from: https://github.com/joelgrus/data-science-from-scratch/blob/master/first-edition/code/multiple_regression.py#L97
