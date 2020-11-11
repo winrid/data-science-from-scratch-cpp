@@ -122,6 +122,17 @@ namespace multiple_regression {
         }
     }
 
+    // lambda is a *hyperparameter* controlling how harsh the penalty is
+    double ridge_penalty(std::vector<double> beta, double lambda) {
+        std::vector<double> beta_without_first(beta.begin() + 1, beta.end());
+        return lambda * vectormath::vector_dot_product(beta_without_first, beta_without_first);
+    }
+
+    double squared_error_ridge(std::vector<double> x_i, double y_i, std::vector<double> beta, double lambda) {
+        double error_rate = error(x_i, y_i, beta);
+        return (error_rate * error_rate) + ridge_penalty(beta, lambda);
+    }
+
 }
 
 #endif //CHAPTER_13_MULTIPLE_REGRESSION_H
