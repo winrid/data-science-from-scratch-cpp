@@ -117,11 +117,13 @@ namespace gradient {
         std::vector<double> min_theta;
         double min_value = std::numeric_limits<double>::infinity();
 
+        bool singleY = y.size() == 1 && x.size() > 1;
+
         std::vector<minimize_stochastic_data> data;
-        for (int i = 0; i < std::min(x.size(), y.size()); i++) {
+        for (int i = 0; i < x.size(); i++) {
             minimize_stochastic_data datum{};
             datum.x = x[i];
-            datum.y = y[i];
+            datum.y = singleY ? std::vector<double>{y[0][i]} : y[i];
             data.push_back(datum);
         }
 
@@ -129,12 +131,12 @@ namespace gradient {
 	    unsigned seed = std::chrono::system_clock::now()
            .time_since_epoch()
            .count();
-//
+
         while (iterations_with_no_improvement < 100) {
             double value = 0;
             for (int i = 0; i < std::min(x.size(), y.size()); i++) {
                 std::vector<double> x_i = x[i];
-                std::vector<double> y_i = y[i];
+                std::vector<double> y_i = singleY ? y[0] : y[i];
                 value += (*target_fn)(x_i, y_i, theta);
             }
 
@@ -153,7 +155,8 @@ namespace gradient {
             std::shuffle(data.begin(), data.end(), std::default_random_engine(seed));
             for (minimize_stochastic_data datum : data) {
                 std::vector<double> gradient_i = (*gradient_fn)(datum.x, datum.y, theta);
-                theta = vectormath::vector_subtract(theta, vectormath::vector_scalar_multiply(gradient_i, alpha));
+                auto multiplied = vectormath::vector_scalar_multiply(gradient_i, alpha);
+                theta = vectormath::vector_subtract(theta, multiplied);
             }
         }
 

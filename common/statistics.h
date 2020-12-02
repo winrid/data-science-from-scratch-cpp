@@ -18,9 +18,12 @@ namespace statistics {
         return v_sorted;
     }
 
-    template<typename Numeric>
-    float mean(std::vector<Numeric> v) {
-        return std::accumulate(v.begin(), v.end(), 0) / (float) v.size();
+    double mean(std::vector<double> v) {
+        double sum = 0;
+        for (double v_i : v) {
+            sum += v_i;
+        }
+        return sum / (double) v.size();
     }
 
     template<typename Numeric>

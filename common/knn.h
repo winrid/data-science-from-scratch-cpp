@@ -65,7 +65,7 @@ namespace knn {
         });
 
         int label_count = std::min(k, (int) labeled_points.size());
-        std::vector<std::string> k_nearest_labels(0);
+        std::vector<std::string> k_nearest_labels;
         for (int i = 0; i < label_count; i++) {
             k_nearest_labels.push_back(labeled_points[i].label);
         }

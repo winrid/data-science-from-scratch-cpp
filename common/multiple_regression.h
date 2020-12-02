@@ -4,6 +4,7 @@
 #include <utility>
 #include <vector>
 #include "gradient.h"
+#include "linear_regression.h"
 #include "probabilities.h"
 #include "vectormath.h"
 
@@ -28,7 +29,7 @@ namespace multiple_regression {
 
     template<typename Numeric>
     std::vector<Numeric> squared_error_gradient(std::vector<Numeric> x_i, Numeric y_i, std::vector<Numeric> beta) {
-        std::vector<Numeric> result(x_i.size());
+        std::vector<Numeric> result;
 
         for (Numeric x_ij : x_i) {
             result.push_back(-2.0 * x_ij * error(x_i, y_i, beta));
@@ -67,7 +68,6 @@ namespace multiple_regression {
     }
 
     double multiple_r_squared(std::vector<std::vector<double>> x, std::vector<double> y, std::vector<double> beta) {
-        // TODO seems like y is a list, but that doesn't make sense when it's supposed to call error() on page 183...
         double sum_of_squared_errors = 0;
 
         for (int i = 0; i < std::min(x.size(), y.size()); i++) {
@@ -75,7 +75,7 @@ namespace multiple_regression {
             sum_of_squared_errors += error_result * error_result;
         }
 
-        return 1.0 - sum_of_squared_errors / vectormath::vector_sum_of_squares(y);
+        return 1.0 - sum_of_squared_errors / linear_regression::total_sum_of_squares(y);
     }
 
     // randomly samples len(data) elements with replacement
@@ -192,8 +192,8 @@ namespace multiple_regression {
         std::mt19937 gen(rd()); // seed the generator
         std::uniform_real_distribution<> distr(0, 1); // define the range
 
-        beta_initial.reserve(x.size());
-        for (int i = 0; i < x.size(); i++) {
+        beta_initial.reserve(x[0].size());
+        for (int i = 0; i < x[0].size(); i++) {
             beta_initial.push_back(distr(gen));
         }
 

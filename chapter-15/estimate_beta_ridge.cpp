@@ -22,10 +22,10 @@ int main() {
             beta_0_str += ss.str();
         }
         std::cout << "For Alpha: " << alpha << "\n";
-        std::cout << "beta_0: " << beta_0_str << "\n"; // TODO for alpha = 0 should be 30.6, 0.97, -1.87, 0.91
+        std::cout << "beta_0: " << beta_0_str << "\n";
         std::vector<double> beta_0_without_first{beta_0.begin() + 1, beta_0.end()};
-        std::cout << "Dot: " << vectormath::vector_dot_product(beta_0_without_first, beta_0_without_first) << "\n"; // TODO for alpha = 0 should be 5.26
-        std::cout << "multiple_r_squared: " << multiple_regression::multiple_r_squared(x, daily_minutes_good, beta_0) << "\n"; // TODO for alpha = 0 should be 0.68
+        std::cout << "Dot: " << vectormath::vector_dot_product(beta_0_without_first, beta_0_without_first) << "\n";
+        std::cout << "multiple_r_squared: " << multiple_regression::multiple_r_squared(x, daily_minutes_good, beta_0) << "\n";
         std::cout << "\n\n";
     }
 }

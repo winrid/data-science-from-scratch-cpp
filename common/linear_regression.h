@@ -17,11 +17,7 @@ namespace linear_regression {
     double sum_of_squared_errors (double alpha, double beta, std::vector<double> x, std::vector<double> y) {
         double sum = 0;
 
-        if (x.size() != y.size()) {
-            throw std::invalid_argument("sum_of_squared_errors x and y must be of same size.");
-        }
-
-        for (int i = 0; i < x.size(); i++) {
+        for (int i = 0; i < std::min(x.size(), y.size()); i++) {
             double x_i = x[i];
             double y_i = y[i];
 
@@ -49,6 +45,7 @@ namespace linear_regression {
     double total_sum_of_squares(std::vector<double> y) {
         double sum = 0;
 
+        std::vector<float> mean = statistics::de_mean(y);
         for (double v : statistics::de_mean(y)) {
             sum += v * v;
         }
