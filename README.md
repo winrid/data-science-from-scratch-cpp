@@ -14,7 +14,7 @@ that the results match. If anyone wants to add tests and make this "useful" - cr
 
 #### Findings
 
-I haven't really found anything astonishing, other than if I were to do data science I'd probably use C++. Python has some
+I haven't really found anything astonishing, other than if I were to do data science I'd probably use a statically typed language. Python has some
 really cool stuff for working with numbers, but C++ is not much harder to write for this kind of thing (can just let the OS clean up the memory at the end in most use cases, or use RAII).
 
 Basic arguments for static typing. For example, reading the book it's very hard to tell if a function is taking an int or a float. It's just so easy to type "int" - why not do it?
