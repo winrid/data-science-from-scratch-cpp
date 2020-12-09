@@ -1,5 +1,5 @@
-#ifndef CHAPTER_13_MULTIPLE_REGRESSION_H
-#define CHAPTER_13_MULTIPLE_REGRESSION_H
+#ifndef CHAPTER_15_MULTIPLE_REGRESSION_H
+#define CHAPTER_15_MULTIPLE_REGRESSION_H
 
 #include <utility>
 #include <vector>
@@ -205,4 +205,4 @@ namespace multiple_regression {
 
 }
 
-#endif //CHAPTER_13_MULTIPLE_REGRESSION_H
+#endif //CHAPTER_15_MULTIPLE_REGRESSION_H

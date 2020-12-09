@@ -1,0 +1,8 @@
+#ifndef CHAPTER_16_LOGISTIC_REGRESSION_H
+#define CHAPTER_16_LOGISTIC_REGRESSION_H
+
+namespace logistic_regression {
+
+}
+
+#endif //CHAPTER_16_LOGISTIC_REGRESSION_H

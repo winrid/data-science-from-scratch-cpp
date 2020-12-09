@@ -24,4 +24,6 @@ add_library(common
         naive_bays_classifier.h
         linear_regression.h
         multiple_regression.h
+        logistic_regression.h
+        data.h
         common.cpp)
